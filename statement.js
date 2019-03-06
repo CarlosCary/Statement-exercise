@@ -8,18 +8,10 @@ function statement (invoice, plays) {
   playsGlobal = plays;
   invoiceGlobal = invoice;
   
-  let result = `Statement for ${invoice.customer}\n`;
-  
-  for (let perf of invoice.performances) {
-    // print line for this order
-    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
-  }  
+  const statementData = {};
+  statementData.customer = invoice.customer;
+  return renderPlainText(statementData, invoice, plays);
 
-  // let totalAmount = appleSauce();
-
-  result += `Amount owed is ${usd(totalAmount())}\n`;
-  result += `You earned ${totalVolumeCredits()} credits\n`;
-  return result;
 }
 
 function amountFor(perf) {
@@ -64,11 +56,11 @@ function format(aNumber) {
 }
 
 function totalVolumeCredits() {
-  let volumeCredits = 0;
+  let result = 0;
   for (let perf of invoiceGlobal.performances) {
-    volumeCredits += volumeCreditsFor(perf); 
+    result += volumeCreditsFor(perf); 
   }
-  return volumeCredits; 
+  return result; 
 }
 
 function appleSauce() {
@@ -79,11 +71,19 @@ function appleSauce() {
 }
 
 function totalAmount() {
-  let totalAmount = 0;
+  let result = 0;
   for (let perf of invoiceGlobal.performances) {
-    totalAmount += amountFor(perf);
+    result += amountFor(perf);
   }
-  return totalAmount; 
+  return result; 
+}
+
+function renderPlainText(data, invoice, plays) { 
+  let result = `Statement for ${data.customer}\n`; 
+  for (let perf of invoice.performances) {
+    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+  }
+  result += `Amount owed is ${usd(totalAmount())}\n`; result += `You earned ${totalVolumeCredits()} credits\n`; return result;
 }
 
 export default statement;
