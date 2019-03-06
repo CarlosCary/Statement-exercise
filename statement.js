@@ -6,6 +6,7 @@ function playFor(aPerformance) {
 
 function statement (invoice, plays) {
   playsGlobal = plays;
+
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
@@ -13,12 +14,7 @@ function statement (invoice, plays) {
                       { style: "currency", currency: "USD",
                         minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
-    // const play = playFor(perf, plays);
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    
-    // add extra credit for every ten comedy attendees
-    if ("comedy" === playFor(perf).type)
-      volumeCredits += Math.floor(perf.audience / 5);
+    volumeCredits += volumeCreditsFor(perf);
 
     // print line for this order
     result += ` ${playFor(perf).name}: ${format(amountFor(perf)/100)} (${perf.audience} seats)\n`;
@@ -53,11 +49,11 @@ function amountFor(perf) {
   return thisAmount;
 }
 
-function volumeCreditsFor(perf) {
-  let volumeCredits = 0;
-  volumeCredits += Math.max(perf.audience - 30, 0);
-  if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
-    return volumeCredits; 
+function volumeCreditsFor(aPerformance) {
+  let result = 0;
+  result += Math.max(aPerformance.audience - 30, 0);
+  if ("comedy" === playFor(aPerformance).type) result += Math.floor(aPerformance.audience / 5);
+  return result; 
 }
   
 export default statement;
