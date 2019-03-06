@@ -14,7 +14,7 @@ function statement (invoice, plays) {
                         minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
     // const play = playFor(perf, plays);
-    let thisAmount = amountFor(perf, playFor(perf, playsGlobal));
+    let thisAmount = amountFor(perf, playFor(perf));
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
@@ -23,7 +23,7 @@ function statement (invoice, plays) {
       volumeCredits += Math.floor(perf.audience / 5);
 
     // print line for this order
-    result += ` ${playFor(perf, playsGlobal).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
+    result += ` ${playFor(perf).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
     totalAmount += thisAmount;
   }
 
