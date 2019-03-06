@@ -1,8 +1,11 @@
-function playFor(aPerformance, plays) {
-  return plays[aPerformance.playID];
+let playsGlobal;
+
+function playFor(aPerformance) {
+  return playsGlobal[aPerformance.playID];
 }
 
 function statement (invoice, plays) {
+  playsGlobal = plays;
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
@@ -11,16 +14,16 @@ function statement (invoice, plays) {
                         minimumFractionDigits: 2 }).format;
   for (let perf of invoice.performances) {
     // const play = playFor(perf, plays);
-    let thisAmount = amountFor(perf, playFor(perf, plays));
+    let thisAmount = amountFor(perf, playFor(perf, playsGlobal));
 
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0);
     // add extra credit for every ten comedy attendees
-    if ("comedy" === playFor(perf, plays).type)
+    if ("comedy" === playFor(perf, playsGlobal).type)
       volumeCredits += Math.floor(perf.audience / 5);
 
     // print line for this order
-    result += ` ${playFor(perf, plays).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
+    result += ` ${playFor(perf, playsGlobal).name}: ${format(thisAmount/100)} (${perf.audience} seats)\n`;
     totalAmount += thisAmount;
   }
 
@@ -50,7 +53,5 @@ function amountFor(perf, play) {
   }
   return thisAmount;
  }
-
-
 
 export default statement;
