@@ -10,7 +10,7 @@ function statement (invoice, plays) {
   
   const statementData = {};
   statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances;
+  statementData.performances = invoice.performances.map(enrichPerformance);;
   return renderPlainText(statementData, plays);
 
 }
@@ -20,7 +20,7 @@ function renderPlainText(data, plays) {
   for (let perf of data.performances) {
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
-  result += `Amount owed is ${usd(totalAmount())}\n`; result += `You earned ${totalVolumeCredits()} credits\n`; return result;
+  result += `Amount owed is ${usd(totalAmount(data))}\n`; result += `You earned ${totalVolumeCredits(data)} credits\n`; return result;
 }
 
 
@@ -65,9 +65,9 @@ function format(aNumber) {
   { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(aNumber);
 }
 
-function totalVolumeCredits() {
+function totalVolumeCredits(data) {
   let result = 0;
-  for (let perf of invoiceGlobal.performances) {
+  for (let perf of data.performances) {
     result += volumeCreditsFor(perf); 
   }
   return result; 
@@ -80,13 +80,18 @@ function appleSauce() {
   return totalAmount; 
 }
 
-function totalAmount() {
+function totalAmount(data) {
   let result = 0;
-  for (let perf of invoiceGlobal.performances) {
+  for (let perf of data.performances) {
     result += amountFor(perf);
   }
   return result; 
 }
 
+function enrichPerformance(aPerformance) {
+  const result = Object.assign({}, aPerformance); 
+  return result;
+}
 
+  
 export default statement;
