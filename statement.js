@@ -90,6 +90,7 @@ function totalAmount(data) {
 
 function enrichPerformance(aPerformance) {
   const result = Object.assign({}, aPerformance); 
+  result.play = playFor(result);
   return result;
 }
 
