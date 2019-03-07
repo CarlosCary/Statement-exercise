@@ -1,21 +1,13 @@
 let playsGlobal;
 let invoiceGlobal;
-function playFor(aPerformance) {
-  return playsGlobal[aPerformance.playID];
-}
+import createStatementData from './createStatementData.js';
+
 
 function statement (invoice, plays) {
   playsGlobal = plays;
   invoiceGlobal = invoice;
   
-  const statementData = {};
-  statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances.map(enrichPerformance);
-  statementData.totalAmount = totalAmount(statementData);
-  statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-
-  return renderPlainText(statementData, plays);
-
+  return renderPlainText(createStatementData(invoice, plays));
 }
 
 function renderPlainText(data, plays) { 
@@ -27,37 +19,6 @@ function renderPlainText(data, plays) {
   result += `Amount owed is ${usd(data.totalAmount)}\n`; 
   result += `You earned ${data.totalVolumeCredits} credits\n`; 
   return result;
-}
-
-
-function amountFor(perf) {
-  let thisAmount = 0;
-  switch (perf.play.type) {
-    case "tragedy":
-      thisAmount = 40000;
-      if (perf.audience > 30) {
-        thisAmount += 1000 * (perf.audience - 30);
-      }
-      break;
-  case "comedy":
-    thisAmount = 30000;
-    if (perf.audience > 20) {
-      thisAmount += 10000 + 500 * (perf.audience - 20);
-    }
-    thisAmount += 300 * perf.audience;
-    break;
-  default:
-    throw new Error(`unknown type: 
-    ${perf.play.type}`);
-  }
-  return thisAmount;
-}
-
-function volumeCreditsFor(aPerformance) {
-  let result = 0;
-  result += Math.max(aPerformance.audience - 30, 0);
-  if ("comedy" === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5);
-  return result; 
 }
   
 function usd(aNumber) {
@@ -71,10 +32,6 @@ function format(aNumber) {
   { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(aNumber);
 }
 
-function totalVolumeCredits(data) {
-  return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
-}
-
 function appleSauce() {
   let totalAmount = 0;
   for (let perf of invoiceGlobal.performances) {
@@ -82,17 +39,9 @@ function appleSauce() {
   return totalAmount; 
 }
 
-function totalAmount(data) {
-  return data.performances.reduce((total, p) => total + p.amount, 0);
-}
 
-function enrichPerformance(aPerformance) {
-  const result = Object.assign({}, aPerformance); 
-  result.play = playFor(result);
-  result.amount = amountFor(result);
-  result.volumeCredits = volumeCreditsFor(result);
-  return result;
-}
+
+
 
   
 export default statement;
